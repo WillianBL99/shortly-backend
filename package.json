@@ -1,0 +1,23 @@
+{
+  "name": "shortly_backend",
+  "version": "1.0.0",
+  "description": "url shorten",
+  "main": "index.js",
+  "scripts": {
+    "test": "node src/index.js"
+  },
+  "keywords": [
+    "shorten",
+    "url",
+    "shortly"
+  ],
+  "author": "Paulo Uilian",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.1",
+    "nodemon": "^2.0.16",
+    "uuid": "^8.3.2"
+  }
+}
