@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "url shorten",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "node src/index.js"
+    "test": "node src/index.js",
+    "dev": "npx nodemon src/index.js"
   },
   "keywords": [
     "shorten",
@@ -14,10 +16,14 @@
   "author": "Paulo Uilian",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "chalk": "^5.0.1",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "joi": "^17.6.0",
     "nodemon": "^2.0.16",
+    "pg": "^8.7.3",
     "uuid": "^8.3.2"
   }
 }
