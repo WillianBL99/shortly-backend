@@ -82,7 +82,7 @@ export async function loginMiddleware(req, res, next){
     delete user.id;
 
 
-    connection.query(`
+    await connection.query(`
       UPDATE sessions
       SET is_active=false
       WHERE user_id=$1

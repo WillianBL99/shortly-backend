@@ -32,7 +32,7 @@ export async function login(req, res) {
     const {user_id, user} = res.locals;
     const token = uuid();    
 
-    connection.query(`
+    await connection.query(`
       INSERT INTO sessions (user_id, token)
       VALUES ($1, $2)
     `,[user_id,token]);

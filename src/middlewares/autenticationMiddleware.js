@@ -1,13 +1,33 @@
-export default function autenticationMiddleware (req, res, next) {
-  const autorisation = req.headers.authorization;
-  const token = autorisation?.split(' ')[1];
-  
-  if(!autorisation || !token) {
-    return res.status(401).send(
-      {error: 'Token não informado ou inválido'}
-    )
-  }
+import connection from '../database/db.js';
 
-  res.locals.token = token;
-  return next();
+export default async function autenticationMiddleware (req, res, next) {
+  try {
+    const autorisation = req.headers.authorization;
+    const token = autorisation?.split(' ')[1];
+    
+    if(!autorisation.includes('Bearer ') || !(token?.length === 36)) {
+      return res.status(401).send(
+        {error: 'Token não informado ou inválido'}
+      )
+    }
+
+    const session = await connection.query(`
+      SELECT * FROM sessions
+      WHERE token=$1 AND is_active=true
+    `,[token]);
+    
+    if(!session.rows[0]){
+      return res.status(401).send(
+        {error: 'Token não informado ou inválido'}
+      )
+    }
+
+    return next();
+
+  } catch (e) {
+    console.log('Error on autentication: ', e);
+    return res.status(500).send(
+      { error: 'Internal server error on autentication'}
+    );
+  }
 }
