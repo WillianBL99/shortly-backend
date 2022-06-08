@@ -11,7 +11,7 @@ CREATE TABLE "urls" (
 	"user_id" integer REFERENCES users(id),
 	"url" TEXT NOT NULL,
 	"short_url" TEXT NOT NULL UNIQUE,
-	"views" integer NOT NULL,
+	"views" integer NOT NULL DEFAULT 0,
 	"created_at" timestamp with time zone NOT NULL DEFAULT NOW()
 );
 
