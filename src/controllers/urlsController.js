@@ -4,7 +4,19 @@ import connection from '../database/db.js';
 export async function urlShorten(req, res){
     try {
         const {url} = req.body;
-        const shortUrl = nanoid(15);
+        const {userId} = res.locals;
+        const shortUrl = nanoid(8);
+
+        const urlQuery = await connection.query(`
+            SELECT * FROM urls
+            WHERE user_id=$1 AND url=$2
+        `,[userId, url]);
+
+        if(urlQuery.rows[0]){
+            return res.status(201).send(
+                {shortUrl: urlQuery.rows[0].short_url}
+            )
+        }
 
         await connection.query(`
             INSERT INTO urls (url, short_url, user_id)
