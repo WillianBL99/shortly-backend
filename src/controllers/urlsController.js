@@ -44,3 +44,34 @@ export async function getUrl(req, res){
         );
     }
 }
+
+export async function openUrl(req, res){
+    try {
+        const {shortUrl} = req.params;
+
+        const urlQuery = await connection.query(`
+            SELECT * FROM urls
+            WHERE short_url=$1
+        `,[shortUrl]);
+        
+        const url = urlQuery.rows[0];
+
+        if(!url){
+            return res.sendStatus(404);
+        }
+
+        await connection.query(`
+            UPDATE urls
+            SET views=$1
+            WHERE id=$2
+        `,[url.views + 1, url.id]);
+
+        res.redirect(url.url);
+        
+    } catch (e) {
+        console.log('Error on open URL: ', e);
+        return res.status(500).send(
+          { error: 'Internal server on open URL' }
+        );
+    }
+}
