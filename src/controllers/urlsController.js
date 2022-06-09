@@ -23,7 +23,7 @@ export async function urlShorten(req, res){
 
 export async function getUrl(req, res){
     try {
-        const {id} = req.body;
+        const {id} = req.params;
 
         const url = await connection.query(`
             SELECT id, short_url as "shortUrl", url
