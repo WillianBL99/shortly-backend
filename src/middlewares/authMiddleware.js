@@ -82,3 +82,20 @@ export async function loginMiddleware(req, res, next){
     return messageError('Error on register' ,e ,res)
   }
 }
+
+export async function getUserMiddleware(req, res, next) {
+  try {
+    const {id} = req.params;
+
+		const user = await getUrlsAndUserById(id);
+		if(!user){
+			return res.sendStatus(404);
+		}	
+
+    res.locals.user = user;
+    next();
+
+  } catch (e) {
+
+  }
+}
