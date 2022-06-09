@@ -5,7 +5,7 @@ export default async function autenticationMiddleware (req, res, next) {
     const autorisation = req.headers.authorization;
     const token = autorisation?.split(' ')[1];
     
-    if(!autorisation.includes('Bearer ') || !(token?.length === 36)) {
+    if(!autorisation?.includes('Bearer ') || !(token?.replaceAll('-','')?.length === 32)) {
       return res.status(401).send(
         {error: 'Token não informado ou inválido'}
       )
@@ -18,9 +18,11 @@ export default async function autenticationMiddleware (req, res, next) {
     
     if(!session.rows[0]){
       return res.status(401).send(
-        {error: 'Token não informado ou inválido'}
+        {error: 'Token inválido'}
       )
     }
+
+    res.locals.userId = session.rows[0].user_id;
 
     return next();
 

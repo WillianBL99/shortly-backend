@@ -7,9 +7,9 @@ export async function urlShorten(req, res){
         const shortUrl = nanoid(15);
 
         await connection.query(`
-            INSERT INTO urls (url, short_url)
-            VALUES ($1, $2)
-        `,[url, shortUrl]);
+            INSERT INTO urls (url, short_url, user_id)
+            VALUES ($1, $2, $3)
+        `,[url, shortUrl, res.locals.userId]);
 
         res.status(201).send({shortUrl});
         
@@ -67,6 +67,40 @@ export async function openUrl(req, res){
         `,[url.views + 1, url.id]);
 
         res.redirect(url.url);
+        
+    } catch (e) {
+        console.log('Error on open URL: ', e);
+        return res.status(500).send(
+          { error: 'Internal server on open URL' }
+        );
+    }
+}
+
+export async function deleteUrl(req, res){
+    try {
+        const {id} = req.params;
+
+        const urlQuery = await connection.query(`
+            SELECT * FROM urls
+            WHERE id=$1
+        `,[id]);
+        
+        const url = urlQuery.rows[0];
+
+        if(!url){
+            return res.sendStatus(404);
+        }
+        
+        if(url.user_id !== res.locals.userId){
+            return res.sendStatus(405);
+        }
+
+        await connection.query(`
+            DELETE FROM urls
+            WHERE id=$1
+        `,[id]);
+
+        res.sendStatus(204);
         
     } catch (e) {
         console.log('Error on open URL: ', e);

@@ -8,7 +8,7 @@ CREATE TABLE "users" (
 
 CREATE TABLE "urls" (
 	"id" serial NOT NULL PRIMARY KEY,
-	"user_id" integer REFERENCES users(id),
+	"user_id" integer NOT NULL REFERENCES users(id),
 	"url" TEXT NOT NULL,
 	"short_url" TEXT NOT NULL UNIQUE,
 	"views" integer NOT NULL DEFAULT 0,
