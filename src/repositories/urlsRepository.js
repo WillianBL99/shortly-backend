@@ -1,10 +1,12 @@
 import connection from "../database/db.js";
 
 export async function getUserUrl(userId, url) {
-  await connection.query(`
+  const urlQuery = await connection.query(`
       SELECT * FROM urls
       WHERE user_id=$1 AND url=$2
   `,[userId, url]);
+
+  return urlQuery.rows[0];
 }
 
 export async function getUrlById(id) {
@@ -47,10 +49,10 @@ export async function increaseUrlViews(currentViews, id) {
     UPDATE urls
     SET views=$1
     WHERE id=$2
-  `,[currentViews + 1, url.id]);
+  `,[currentViews + 1, id]);
 }
 
-export async function deleteUrl(id) {
+export async function deleteUrlById(id) {
   await connection.query(`
     DELETE FROM urls
     WHERE id=$1

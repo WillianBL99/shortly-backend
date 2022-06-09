@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { createShortUrl, getUrlById, getUrlByShortUrl, getUserUrl, increaseUrlViews } from '../repositories/urlsRepository.js';
+import { createShortUrl, deleteUrlById, getUrlById, getUrlByShortUrl, getUserUrl, increaseUrlViews } from '../repositories/urlsRepository.js';
 import messageError from '../utils/messageError.js'
 
 export async function urlShorten(req, res){
@@ -61,7 +61,7 @@ export async function deleteUrl(req, res){
 	try {
 		const {id} = req.params;
 
-		await deleteUrl(id);
+		await deleteUrlById(id);
 
 		res.sendStatus(204);
 			

@@ -1,3 +1,4 @@
+import { getRankingsOfUsers, getUrlsOfUser } from "../repositories/userRepository.js";
 import messageError from "../utils/messageError.js";
 
 export async function getUser(req, res){
@@ -15,7 +16,7 @@ export async function getUser(req, res){
 
 export async function getRankings(req, res){
 	try {
-		const rankings = await getRankings();
+		const rankings = await getRankingsOfUsers();
 		res.status(200).send(rankings);
 		
 	} catch (e) {

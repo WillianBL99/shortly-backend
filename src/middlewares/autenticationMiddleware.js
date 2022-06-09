@@ -1,4 +1,5 @@
 import connection from '../database/db.js';
+import messageError from '../utils/messageError.js';
 
 export default async function autenticationMiddleware (req, res, next) {
   try {
@@ -27,9 +28,6 @@ export default async function autenticationMiddleware (req, res, next) {
     return next();
 
   } catch (e) {
-    console.log('Error on autentication: ', e);
-    return res.status(500).send(
-      { error: 'Internal server error on autentication'}
-    );
+    return messageError('Error on autentication', e, res);
   }
 }

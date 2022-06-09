@@ -1,3 +1,5 @@
+import connection from "../database/db.js";
+
 export async function getUrlsAndUserById(id) {
 	const userAndUrls = await connection.query(`
 		SELECT u.id, u.name, COALESCE(SUM(ul.views),0) AS "visitCout"
@@ -20,7 +22,7 @@ export async function getUrlsOfUser(id) {
 	return urlsOfUser.rows[0];
 }
 
-export async function getRankings() {
+export async function getRankingsOfUsers() {
 	const rankings = await connection.query(`
 		SELECT u.id, u.name, COUNT(ul.id) AS "linksCount", COALESCE(SUM(ul.views),0) AS "visitCount"
 		FROM urls ul

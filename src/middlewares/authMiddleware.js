@@ -2,6 +2,7 @@ import Joi from 'joi';
 import bcrypt from 'bcrypt';
 import { getUserByEmail, updateSession } from '../repositories/authRepository.js';
 import messageError from '../utils/messageError.js';
+import { getUrlsAndUserById } from '../repositories/userRepository.js';
 
 export async function registerMiddleware(req, res, next){
   const validation = Joi.object({
@@ -21,9 +22,8 @@ export async function registerMiddleware(req, res, next){
 
   try {
     const {email} = req.body;
-
     const user = await getUserByEmail(email);
-    console.log(user);
+    
     if(user){
       return res.status(422).send({
         message: 'User already exists'
@@ -96,6 +96,6 @@ export async function getUserMiddleware(req, res, next) {
     next();
 
   } catch (e) {
-
+    return messageError('Error getting user', e, res);
   }
 }

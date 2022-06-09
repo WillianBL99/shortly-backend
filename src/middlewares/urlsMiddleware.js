@@ -1,5 +1,6 @@
 import Joi from "joi";
-import messageError from "../utils/messageError";
+import { getCompletUrlById } from "../repositories/urlsRepository.js";
+import messageError from "../utils/messageError.js";
 
 export async function createShortUrlMiddleware(req, res, next){
 	const validation = Joi.object({
