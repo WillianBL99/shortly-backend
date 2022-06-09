@@ -1,6 +1,8 @@
 import connection from '../database/db.js';
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
+import { getUserByEmail, updateSession } from '../repositories/authRepository.js';
+import messageError from '../utils/messageError.js';
 
 export async function registerMiddleware(req, res, next){
   const validation = Joi.object({
@@ -21,11 +23,9 @@ export async function registerMiddleware(req, res, next){
   try {
     const {email} = req.body;
 
-    const user = await connection.query(`
-      SELECT * FROM users WHERE email=$1
-    `, [email]);
+    const user = getUserByEmail(email);
 
-    if(user.rows[0]){
+    if(user){
       return res.status(422).send({
         message: 'User already exists'
       });
@@ -34,10 +34,7 @@ export async function registerMiddleware(req, res, next){
     next();
 
   } catch (e) {
-    console.log('Error on register: ', e);
-    return res.status(500).send(
-      { error: 'Internal server error on register' }
-    );
+    return messageError('Error on register', e, res);
   }
 }
 
@@ -57,13 +54,7 @@ export async function loginMiddleware(req, res, next){
 
   try {
     const {email, password} = req.body;
-
-    const userQuery = await connection.query(`
-      SELECT * FROM users 
-      WHERE email=$1
-    `, [email]);
-
-    const user = userQuery.rows[0];
+    const user = getUserByEmail(email);
 
     if(!user){
       return res.status(401).send({
@@ -78,25 +69,17 @@ export async function loginMiddleware(req, res, next){
     }
 
     const user_id = user.id;
+    updateSession(user_id);
+
     delete user.password;
     delete user.id;
 
-
-    await connection.query(`
-      UPDATE sessions
-      SET is_active=false
-      WHERE user_id=$1
-    `,[user_id]);
-
-    res.locals.user_id = user_id;
+    res.locals.userId = user_id;
     res.locals.user = user;
 
     next();
 
   } catch (e) {
-    console.log('Error on register: ', e);
-    return res.status(500).send(
-      { error: 'Internal server error on register' }
-    );
+    return messageError('Error on register' ,e ,res)
   }
 }
