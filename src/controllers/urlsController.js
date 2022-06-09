@@ -1,123 +1,71 @@
 import { nanoid } from 'nanoid';
-import connection from '../database/db.js';
+import { createShortUrl, getUrlById, getUrlByShortUrl, getUserUrl, increaseUrlViews } from '../repositories/urlsRepository.js';
+import messageError from '../utils/messageError.js'
 
 export async function urlShorten(req, res){
-    try {
-        const {url} = req.body;
-        const {userId} = res.locals;
-        const shortUrl = nanoid(8);
+	try {
+		const {url} = req.body;
+		const {userId} = res.locals;
+		const shortUrl = nanoid(8);
 
-        const urlQuery = await connection.query(`
-            SELECT * FROM urls
-            WHERE user_id=$1 AND url=$2
-        `,[userId, url]);
+		const urlQuery = await getUserUrl(userId, url);
+		if(urlQuery){
+			return res.status(201).send(
+				{shortUrl: urlQuery.short_url}
+			);
+		}
 
-        if(urlQuery.rows[0]){
-            return res.status(201).send(
-                {shortUrl: urlQuery.rows[0].short_url}
-            )
-        }
+		await createShortUrl(url, shortUrl, userId);
 
-        await connection.query(`
-            INSERT INTO urls (url, short_url, user_id)
-            VALUES ($1, $2, $3)
-        `,[url, shortUrl, res.locals.userId]);
-
-        res.status(201).send({shortUrl});
-        
-    } catch (e) {
-        console.log('Error creating short URL: ', e);
-        return res.status(500).send(
-          { error: 'Internal server error creating short URL' }
-        );
-    }
+		res.status(201).send({shortUrl});
+			
+	} catch (e) {
+		return messageError('Error creating short URL', e, res);
+	}
 }
 
 export async function getUrl(req, res){
-    try {
-        const {id} = req.params;
+	try {
+		const {id} = req.params;
+		const url = await getUrlById(id);
+		if(!url){
+			return res.sendStatus(404);
+		}
 
-        const url = await connection.query(`
-            SELECT id, short_url as "shortUrl", url
-            FROM urls
-            WHERE id=$1
-        `,[id]);
-
-        if(!url.rows[0]){
-            return res.sendStatus(404);
-        }
-
-        res.status(200).send(url.rows[0]);
-        
-    } catch (e) {
-        console.log('Error getting URL: ', e);
-        return res.status(500).send(
-          { error: 'Internal server error getting URL' }
-        );
-    }
+		res.status(200).send(url);
+			
+	} catch (e) {
+		return messageError('Error getting URL', e, res);
+	}
 }
 
 export async function openUrl(req, res){
-    try {
-        const {shortUrl} = req.params;
+	try {
+		const {shortUrl} = req.params;
 
-        const urlQuery = await connection.query(`
-            SELECT * FROM urls
-            WHERE short_url=$1
-        `,[shortUrl]);
-        
-        const url = urlQuery.rows[0];
+		const url = await getUrlByShortUrl(shortUrl);
+		if(!url){
+			return res.sendStatus(404);
+		}
 
-        if(!url){
-            return res.sendStatus(404);
-        }
+		await increaseUrlViews(url.views, url.id);
 
-        await connection.query(`
-            UPDATE urls
-            SET views=$1
-            WHERE id=$2
-        `,[url.views + 1, url.id]);
-
-        res.redirect(url.url);
-        
-    } catch (e) {
-        console.log('Error on open URL: ', e);
-        return res.status(500).send(
-          { error: 'Internal server on open URL' }
-        );
-    }
+		res.redirect(url.url);
+			
+	} catch (e) {
+		return messageError('Error on open URL', e, res);
+	}
 }
 
 export async function deleteUrl(req, res){
-    try {
-        const {id} = req.params;
+	try {
+		const {id} = req.params;
 
-        const urlQuery = await connection.query(`
-            SELECT * FROM urls
-            WHERE id=$1
-        `,[id]);
-        
-        const url = urlQuery.rows[0];
+		await deleteUrl(id);
 
-        if(!url){
-            return res.sendStatus(404);
-        }
-        
-        if(url.user_id !== res.locals.userId){
-            return res.sendStatus(405);
-        }
-
-        await connection.query(`
-            DELETE FROM urls
-            WHERE id=$1
-        `,[id]);
-
-        res.sendStatus(204);
-        
-    } catch (e) {
-        console.log('Error on open URL: ', e);
-        return res.status(500).send(
-          { error: 'Internal server on open URL' }
-        );
-    }
+		res.sendStatus(204);
+			
+	} catch (e) {
+		return messageError('Error on deleteUrl', e, res);
+	}
 }

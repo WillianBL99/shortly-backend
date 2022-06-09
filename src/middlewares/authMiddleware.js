@@ -1,4 +1,3 @@
-import connection from '../database/db.js';
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
 import { getUserByEmail, updateSession } from '../repositories/authRepository.js';
@@ -23,8 +22,8 @@ export async function registerMiddleware(req, res, next){
   try {
     const {email} = req.body;
 
-    const user = getUserByEmail(email);
-
+    const user = await getUserByEmail(email);
+    console.log(user);
     if(user){
       return res.status(422).send({
         message: 'User already exists'
@@ -54,7 +53,7 @@ export async function loginMiddleware(req, res, next){
 
   try {
     const {email, password} = req.body;
-    const user = getUserByEmail(email);
+    const user = await getUserByEmail(email);
 
     if(!user){
       return res.status(401).send({
@@ -69,7 +68,7 @@ export async function loginMiddleware(req, res, next){
     }
 
     const user_id = user.id;
-    updateSession(user_id);
+    await updateSession(user_id);
 
     delete user.password;
     delete user.id;

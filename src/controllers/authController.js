@@ -1,4 +1,3 @@
-import connection from '../database/db.js';
 import bcrypt from 'bcrypt';
 import {v4 as uuid} from 'uuid';
 import { createSession, createUser } from '../repositories/authRepository.js';
@@ -10,7 +9,7 @@ export async function register(req, res) {
     const jump = 10;
     const bcryptPassword = bcrypt.hashSync(password, jump);
 
-    createUser(name, email, bcryptPassword)
+    await createUser(name, email, bcryptPassword)
 
     res.sendStatus(201);
 
@@ -24,7 +23,7 @@ export async function login(req, res) {
     const {userId, user} = res.locals;
     const token = uuid();    
 
-    createSession(userId, token);
+    await createSession(userId, token);
 
     res.status(200).send({...user, token});
 

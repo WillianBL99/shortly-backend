@@ -1,3 +1,5 @@
+import connection from '../database/db.js';
+
 export async function createUser(name, email, bcryptPassword) {
   await connection.query(
     `
