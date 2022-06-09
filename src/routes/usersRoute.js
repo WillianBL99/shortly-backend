@@ -4,9 +4,7 @@ import autenticationMiddleware from '../middlewares/autenticationMiddleware.js';
 
 const userRoute = express.Router();
 
-userRoute.use(autenticationMiddleware);
-
-userRoute.get('/users/:id', getUser);
-userRoute.get('/users/ranking', getRankings);
+userRoute.get('/users/:id',autenticationMiddleware, getUser);
+userRoute.get('/ranking', getRankings);
 
 export default userRoute;
