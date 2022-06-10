@@ -5,7 +5,6 @@ import messageError from "../utils/messageError.js";
 export async function deleteUrlMeddleWare(req, res, next) {
 	try {
 		const {id} = req.params;
-		if(!Number(id)) return res.sendStatus(422);
 		
 		const url = await getCompletUrlById(id);
 		if(!url){
