@@ -1,10 +1,13 @@
 import Joi from "joi";
 import { getCompletUrlById } from "../repositories/urlsRepository.js";
 import messageError from "../utils/messageError.js";
+import validUrl from 'valid-url';
 
 export async function createShortUrlMiddleware(req, res, next){
+	
+	const reg = /^(https:\/\/\/www\.|http:\/\/www\.|www\.|https:\/\/|http:\/\/)/;
 	const validation = Joi.object({
-		url: Joi.string().uri().required()
+		url: Joi.string().uri().regex(reg).required()
 	});
 
 	const { error } = validation.validate(req.body, { abortEarly: false });
