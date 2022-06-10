@@ -8,6 +8,7 @@ const databaseConfig = {
 };
 
 if(process.env.MODE === 'PROD') {
+  console.log('ssl');
   databaseConfig.ssl = {
     rejectUnauthorized: false
   }
