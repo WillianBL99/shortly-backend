@@ -7,10 +7,7 @@ const databaseConfig = {
   connectionString: process.env.DATABASE_URL,
 };
 
-console.log('ssl');
 if(process.env.MODE === 'PROD') {
-
-console.log('ssl2');
   databaseConfig.ssl = {
     rejectUnauthorized: false
   }

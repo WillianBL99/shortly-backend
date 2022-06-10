@@ -5,7 +5,6 @@ import messageError from '../utils/messageError.js';
 import { getUrlsAndUserById } from '../repositories/userRepository.js';
 
 export async function registerMiddleware(req, res, next){
-  console.log('entrou')
   const validation = Joi.object({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
