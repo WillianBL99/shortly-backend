@@ -5,21 +5,6 @@ import messageError from '../utils/messageError.js';
 import { getUrlsAndUserById } from '../repositories/userRepository.js';
 
 export async function registerMiddleware(req, res, next){
-  const validation = Joi.object({
-    name: Joi.string().required(),
-    email: Joi.string().email().required(),
-    password: Joi.string().min(4).required(),
-    confirmPassword: Joi.ref('password')
-  });
-
-  const { error } = validation.validate(req.body, { abortEarly: false });
-
-  if (error) {
-    return res.status(422).send(
-      error.details.map( detail => detail.message)
-    )
-  }
-
   try {
     const {email} = req.body;
     const user = await getUserByEmail(email);
@@ -38,19 +23,6 @@ export async function registerMiddleware(req, res, next){
 }
 
 export async function loginMiddleware(req, res, next){
-  const validation = Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().min(4).required()
-  });
-
-  const { error } = validation.validate(req.body, { abortEarly: false });
-
-  if (error) {
-    return res.status(422).send(
-      error.details.map( detail => detail.message)
-    )
-  }
-
   try {
     const {email, password} = req.body;
     const user = await getUserByEmail(email);
